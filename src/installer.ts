@@ -88,11 +88,15 @@ export async function getNode(
 
     core.addPath(toolPath);
 
+    core.info(`Expected node version: ${versionSpec}`);
+
     const {stdout: installedVersion} = await exec.getExecOutput(
       'node',
       ['--version'],
       {ignoreReturnCode: true}
     );
+
+    core.info(`Installed Binary version: ${installedVersion}`);
 
     if (semver.satisfies(installedVersion, versionSpec)) {
       return;
