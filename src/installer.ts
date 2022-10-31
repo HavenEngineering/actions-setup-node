@@ -80,7 +80,8 @@ export async function getNode(
 
   // If not found in cache, download
   if (toolPath) {
-    core.info(`Found in cache @ ${toolPath}`);
+    core.info(`Found a version in cache @ ${toolPath}`);
+    core.info(`Matched version spec: ${versionSpec}`);
 
     if (osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
