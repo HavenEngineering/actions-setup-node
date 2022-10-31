@@ -71409,6 +71409,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const hc = __importStar(__nccwpck_require__(9925));
 const io = __importStar(__nccwpck_require__(7436));
 const tc = __importStar(__nccwpck_require__(7784));
+const exec = __importStar(__nccwpck_require__(1514));
 const path = __importStar(__nccwpck_require__(1017));
 const semver = __importStar(__nccwpck_require__(5911));
 const fs = __nccwpck_require__(7147);
@@ -71446,9 +71447,22 @@ function getNode(versionSpec, stable, checkLatest, auth, arch = os.arch()) {
         toolPath = tc.find('node', versionSpec, osArch);
         // If not found in cache, download
         if (toolPath) {
-            core.info(`Found in cache @ ${toolPath}`);
+            core.info(`Found a version in cache @ ${toolPath}`);
+            core.info(`Matched version spec: ${versionSpec}`);
+            if (osPlat != 'win32') {
+                toolPath = path.join(toolPath, 'bin');
+            }
+            core.addPath(toolPath);
+            core.info(`Expected node version: ${versionSpec}`);
+            const { stdout: installedVersion } = yield exec.getExecOutput('node', ['--version'], { ignoreReturnCode: true });
+            core.info(`Installed Binary version: ${installedVersion}`);
+            if (semver.satisfies(installedVersion, versionSpec)) {
+                return;
+            }
+            core.info(`Found ${installedVersion} in cache @ ${toolPath} but it does not satisfy the requested version (${versionSpec})`);
+            toolPath = '';
         }
-        else {
+        if (!toolPath) {
             core.info(`Attempting to download ${versionSpec}...`);
             let downloadPath = '';
             let info = null;
